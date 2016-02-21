@@ -1,0 +1,13 @@
+//
+   Created by Lars on 21.02.2016.
+
+
+script(src="https://cdn.socket.io/socket.io-1.4.5.js")
+script(src="/html-sync/html-sync.js")
+script.
+    var htmlSync = new HTMLSync({});
+    var hello = new Part("h1");
+    hello.setAttributes({
+        innerHTML:"Hello World"
+    });
+    htmlSync.add(hello);

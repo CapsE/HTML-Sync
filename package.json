@@ -1,0 +1,27 @@
+{
+  "name": "html-sync",
+  "version": "1.0.2",
+  "description": "Syncs HTML-Elements across multiple clients",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CapsE/HTML-Sync.git"
+  },
+  "keywords": [
+    "sync",
+    "websocket",
+    "socket.io"
+  ],
+  "author": "Lars Krafft",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CapsE/HTML-Sync/issues"
+  },
+  "homepage": "https://github.com/CapsE/HTML-Sync",
+  "dependencies": {
+    "socket.io": "*"
+  }
+}
