@@ -61,10 +61,14 @@ app.use(function(err, req, res, next) {
 });
 
 var io = require('socket.io')(http);
+var HTMLSync = require('html-sync');
+var hs = new HTMLSync(io, {debug:true});
+console.log("rooms", HTMLSync.rooms);
 
 io.on('connection', function(socket){
   console.log('a user connected');
-  var htmlSync = require('html-sync')(socket);
+
+  HTMLSync.setSocket(socket);
 });
 
 module.exports = app;

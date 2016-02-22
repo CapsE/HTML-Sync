@@ -3,7 +3,7 @@
  */
 
 /// <reference path="./typings/socket.io.d.ts"/>
-/// <reference path="Part.ts"/>
+/// <reference path="part.ts"/>
 
 interface Params {
     url?:string,
@@ -14,6 +14,7 @@ class HTMLSync{
     static socket:Socket;
     static parts;
     static instance:HTMLSync;
+    static params;
     room:string;
 
     constructor(params?:Params){
@@ -24,6 +25,7 @@ class HTMLSync{
         if(!params){
             params = {};
         }
+        HTMLSync.params = params;
         if(!HTMLSync.socket){
             if(params.url){
                 HTMLSync.socket = io.connect(params.url);
@@ -32,21 +34,31 @@ class HTMLSync{
             }
         }
 
-        this.room = params.room || "/";
+        if(params.room){
+            this.room = params.room
+        }else{
+            this.room = "/";
+        }
+
+        HTMLSync.socket.emit("join",{room: this.room} );
 
         if(!HTMLSync.parts){
             HTMLSync.parts = {};
         }
 
         HTMLSync.socket.on("update", function (msg) {
-
+            if(HTMLSync.params.debug){
+                console.log("update", msg);
+            }
             if (HTMLSync.parts[msg.id]) {
                 HTMLSync.parts[msg.id].update(msg);
             }
         });
 
         HTMLSync.socket.on("add", function (msg) {
-
+            if(HTMLSync.params.debug){
+                console.log("add", msg);
+            }
             var p = new Part("", msg);
 
             if (!msg.parent) {
@@ -63,7 +75,9 @@ class HTMLSync{
         });
 
         HTMLSync.socket.on("delete", function (msg) {
-            console.debug("Deleting " + msg.id);
+            if(HTMLSync.params.debug){
+                console.log("delete", msg);
+            }
             var minId = HTMLSync.parts[msg.id].data.minimizedId;
             if(minId && minId != "false"){
                 var obj = document.getElementById(minId);

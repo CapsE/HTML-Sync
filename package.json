@@ -1,6 +1,6 @@
 {
   "name": "html-sync",
-  "version": "1.0.2",
+  "version": "1.0.7",
   "description": "Syncs HTML-Elements across multiple clients",
   "main": "app.js",
   "scripts": {
