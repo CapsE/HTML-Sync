@@ -15,7 +15,7 @@ class HTMLSync{
     static parts;
     static instance:HTMLSync;
     static params;
-    room:string;
+    static room:string;
 
     constructor(params?:Params){
         if(!HTMLSync.instance){
@@ -35,9 +35,9 @@ class HTMLSync{
         }
 
         if(params.room){
-            this.room = params.room
+            HTMLSync.room = params.room
         }else{
-            this.room = "/";
+            HTMLSync.room = "/";
         }
 
         HTMLSync.socket.emit("join",{room: this.room} );

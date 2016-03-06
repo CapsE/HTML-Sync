@@ -21,10 +21,10 @@ var HTMLSync = (function () {
             }
         }
         if (params.room) {
-            this.room = params.room;
+            HTMLSync.room = params.room;
         }
         else {
-            this.room = "/";
+            HTMLSync.room = "/";
         }
         HTMLSync.socket.emit("join", { room: this.room });
         if (!HTMLSync.parts) {

@@ -27,6 +27,7 @@ class Part{
     attributes: any = {};
     data: any = {};
     functions: any = {};
+    handlers: any = {};
     static includes: string[] = [];
     static includesToLoad: number = 0;
     parent:Part;
@@ -73,35 +74,52 @@ class Part{
         this.content.push(obj);
     }
 
-    setStyle(attribute: string, value: string){
+    css(attribute:string, value?:string){
+        if(value){
+            this.setStyle(attribute, value);
+        }else{
+            this.setStyles(attribute);
+        }
+    }
+
+    private setStyle(attribute: string, value: string){
         this.style[attribute] = value;
     }
 
-    setStyles(style: any){
+    private setStyles(style: any){
         for(var key in style){
             this.style[key] = style[key];
         }
     }
 
-    setAttribute(attribute: string, value: string){
+    attr(attribute:string, value?:string){
+        if(value){
+            this.setAttribute(attribute, value);
+        }else{
+            this.setAttributes(attribute);
+        }
+    }
+
+    private setAttribute(attribute: string, value: string){
         this.attributes[attribute] = value;
     }
 
-    setAttributes(attribute: any){
+    private setAttributes(attribute: any){
         for(var key in attribute){
             this.attributes[key] = attribute[key];
         }
     }
 
-    setEventHandler(attribute: string, value: any){
-        this.functions[attribute] = this.prepareFunction(value);
+    on(attribute: string, value: any){
+        this.addEventHandler(attribute, value);
     }
 
     addEventHandler(attribute: string, value: any){
         if(!this.functions[attribute]){
             this.functions[attribute] = [];
         }
-        this.functions[attribute].push(this.prepareFunction(value));
+        this.functions[attribute].push(value);
+        this.handlers[attribute] = true;
     }
 
     addInclude(incl: string){
@@ -133,9 +151,8 @@ class Part{
         var result = [];
         var func = this.functions[func];
         if(func){
-            for(var f in func){
-                eval("var x = " + func[f]);
-                result.push(x(e));
+            for(var i=0, y = func.length; i < y; i++){
+                result.push(_.bind(func[i], this)(e));
             }
         }
         if(result.length == 1){
@@ -236,6 +253,9 @@ class Part{
      * Finds the HTML-Element and applies all attributes, styles and functions again with the current state.
      */
     update(fields?:UpdateData, send?:boolean){
+        if(send === "undefined"){
+            send = true;
+        }
         if(!fields){
             this.renderHTML();
         }else if(!send){
@@ -271,6 +291,7 @@ class Part{
         }
         if(send){
             fields.id = this.id;
+            fields.roomId = HTMLSync.room;
             HTMLSync.update(fields);
         }
         this.raiseEvent("updated", {}, true, true);
@@ -281,7 +302,13 @@ class Part{
      * @returns {{id: string, type: string, content: Array, style: any, attributes: any, functions: any}}
      */
     toJSON(){
-        var json = {id: this.id, type: this.type, namespace: this.namespace, content: [], style: this.style, attributes: this.attributes, functions: this.functions, data: this.data, includes: Part.includes};
+        var stringFunctions = this.functions;
+        for(var i in this.functions){
+            for(var x =0, y = this.functions[i].length; x < y; x++){
+                stringFunctions[i][x] = this.functions[i][x].toString();
+            }
+        }
+        var json = {id: this.id, type: this.type, namespace: this.namespace, content: [], style: this.style, attributes: this.attributes, functions: stringFunctions, handlers: this.handlers, data: this.data, includes: Part.includes};
         for(var p in this.content){
             json.content.push(this.content[p].toJSON());
         }
@@ -321,8 +348,18 @@ class Part{
         }
 
         for(var i in this.functions){
-            //eval("this." + i + " = " + this.functions[i]);
-            eval("newElement.addEventListener('" + i + "', function(e){HTMLSync.parts[this.id].call('"+ i + "',e);})");
+            for(var x =0, y = this.functions[i].length; x < y; x++){
+                console.log("this.functions['" + i + "'][" + x + "] = " + this.functions[i][x] );
+                eval("this.functions['" + i + "'][" + x + "] = " + this.functions[i][x]);
+            }
+
+            console.log(this.functions[i]);
+
+
+        }
+
+        for(var i in this.handlers){
+            eval("newElement.addEventListener('" + i + "', function(e){HTMLSync.parts['" + this.id +"'].call('"+ i + "',e);})");
         }
 
         for(var i in Part.includes){

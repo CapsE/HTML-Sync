@@ -1,8 +1,9 @@
 //
    Created by Lars on 21.02.2016.
 
-
+script(data-main="js/main" src="js/lib/require-js/require.js")
 script(src="https://cdn.socket.io/socket.io-1.4.5.js")
+script(src="http://underscorejs.org/underscore-min.js")
 script(src="/html-sync/js/html-sync.js")
 script(src="/html-sync/js/part.js")
 script.
@@ -11,4 +12,12 @@ script.
     hello.setAttributes({
         innerHTML:"Hello World"
     });
+    hello.on("click", function(e){
+        console.log(this);
+        this.update({
+            style:{
+                color:"red"
+            }
+        });
+    })
     htmlSync.add(hello);
