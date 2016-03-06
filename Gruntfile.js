@@ -10,8 +10,8 @@ module.exports = function(grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             build: {
-                src: ['js/lib/socket.io.js', 'js/lib/undersocre.js', 'js/html-sync.js', 'js/part.js'],
-                dest: 'html-sync.js'
+                src: ['js/lib/socket.io.js', 'js/lib/underscore.js', 'js/html-sync.js', 'js/part.js'],
+                dest: 'html-sync.min.js'
             }
         }
     });

@@ -51,6 +51,7 @@ class Part{
             this.style = json.style;
             this.attributes = json.attributes;
             this.functions = json.functions;
+            this.handlers = json.handlers;
             this.data = json.data;
             Part.includes = json.includes;
 
@@ -349,17 +350,14 @@ class Part{
 
         for(var i in this.functions){
             for(var x =0, y = this.functions[i].length; x < y; x++){
-                console.log("this.functions['" + i + "'][" + x + "] = " + this.functions[i][x] );
                 eval("this.functions['" + i + "'][" + x + "] = " + this.functions[i][x]);
             }
-
-            console.log(this.functions[i]);
-
-
         }
 
         for(var i in this.handlers){
-            eval("newElement.addEventListener('" + i + "', function(e){HTMLSync.parts['" + this.id +"'].call('"+ i + "',e);})");
+            newElement.addEventListener(i, function(e){
+                HTMLSync.parts[e.target.id].call(i,e);
+            });
         }
 
         for(var i in Part.includes){
