@@ -23,5 +23,8 @@
   "homepage": "https://github.com/CapsE/HTML-Sync",
   "dependencies": {
     "socket.io": "*"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5"
   }
 }

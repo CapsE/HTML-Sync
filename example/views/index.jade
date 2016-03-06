@@ -1,7 +1,7 @@
 //
    Created by Lars on 21.02.2016.
 
-script(data-main="html-sync/js/main" src="html-sync/js/lib/require-js/require.js")
+script(src="/html-sync.min.js")
 
 script.
     var htmlSync = new HTMLSync({debug:true});
@@ -12,9 +12,9 @@ script.
     hello.on("click", function(e){
         console.log(this);
         this.update({
-        style:{
-        color:"red"
-        }
+            style:{
+                color:"red"
+            }
         });
     })
     htmlSync.add(hello);
