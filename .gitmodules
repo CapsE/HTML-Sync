@@ -1,9 +1,0 @@
-[submodule "js/lib/require-js"]
-	path = js/lib/require-js
-	url = https://github.com/jrburke/requirejs.git
-[submodule "js/lib/underscore"]
-	path = js/lib/underscore
-	url = https://github.com/jashkenas/underscore.git
-[submodule "js/lib/socket-io-client"]
-	path = js/lib/socket-io-client
-	url = https://github.com/socketio/socket.io-client.git
