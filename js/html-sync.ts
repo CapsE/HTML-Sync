@@ -51,7 +51,7 @@ class HTMLSync{
                 console.log("update", msg);
             }
             if (HTMLSync.parts[msg.id]) {
-                HTMLSync.parts[msg.id].update(msg);
+                HTMLSync.parts[msg.id].update(msg, false);
             }
         });
 

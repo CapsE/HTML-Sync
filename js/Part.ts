@@ -254,7 +254,7 @@ class Part{
      * Finds the HTML-Element and applies all attributes, styles and functions again with the current state.
      */
     update(fields?:UpdateData, send?:boolean){
-        if(send === "undefined"){
+        if(typeof(send) === "undefined"){
             send = true;
         }
         if(!fields){
@@ -289,8 +289,7 @@ class Part{
                 var event = new CustomEvent(fields.calls[i].name, {detail: fields.calls[i].detail});
                 this.html().dispatchEvent(event);
             }
-        }
-        if(send){
+        }else{
             fields.id = this.id;
             fields.roomId = HTMLSync.room;
             HTMLSync.update(fields);

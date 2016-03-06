@@ -121,6 +121,7 @@ class HTMLSync{
         HTMLSync.getRoom(fields.roomId, function(room){
             var obj = room.forms[fields.id];
             if(obj){
+                console.log("Object found updating");
                 for(var i in fields.style){
                     eval("obj.style." + i + " = \"" + fields.style[i] + "\"");
                 }
@@ -138,6 +139,7 @@ class HTMLSync{
                 }
                 room.forms[fields.id] = obj;
             }else{
+                console.log("Object NOT found!");
                 var obj = room.updates[fields.id]
                 if(obj){
                     for(var k in fields){
