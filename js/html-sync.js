@@ -71,6 +71,9 @@ var HTMLSync = (function () {
             obj.parentElement.removeChild(obj);
             delete HTMLSync.parts[msg.id];
         });
+        HTMLSync.socket.on("joined", function (msg) {
+            console.log(msg.id);
+        });
     }
     HTMLSync.prototype.update = function (obj) {
         obj.roomId = this.room;

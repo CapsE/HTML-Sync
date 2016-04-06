@@ -92,6 +92,10 @@ class HTMLSync{
 
             delete HTMLSync.parts[msg.id];
         });
+
+        HTMLSync.socket.on("joined", function(msg){
+            console.log(msg.id);
+        });
     }
 
     update(obj:any) {

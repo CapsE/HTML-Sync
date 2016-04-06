@@ -81,6 +81,8 @@ class HTMLSync{
             socket.join(roomId);
             socket.roomId = roomId;
 
+            socket.to(roomId).emit("joined", {id: socket.id});
+
             var room = HTMLSync.getRoom(roomId);
             var forms = Object.keys(room.forms);
             for(var i = 0; i < forms.length; i++){
