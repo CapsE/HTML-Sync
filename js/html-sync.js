@@ -74,9 +74,13 @@ var HTMLSync = (function () {
         HTMLSync.socket.on("joined", function (msg) {
             console.log(msg.id);
         });
+        if (HTMLSync.params.debug) {
+            console.log("Constructor", params);
+            console.log("Joined", HTMLSync.room);
+        }
     }
     HTMLSync.prototype.update = function (obj) {
-        obj.roomId = this.room;
+        obj.roomId = HTMLSync.room;
         HTMLSync.socket.emit("update", obj);
     };
     HTMLSync.update = function (obj) {
@@ -84,18 +88,21 @@ var HTMLSync = (function () {
     };
     HTMLSync.prototype.add = function (obj, parent) {
         var json = obj.toJSON();
-        json["roomId"] = this.room;
+        json["roomId"] = HTMLSync.room;
         if (parent) {
             json["parent"] = parent.id;
         }
         HTMLSync.socket.emit("add", json);
+        if (HTMLSync.params.debug) {
+            console.log("add", json);
+        }
         return obj.id;
     };
     HTMLSync.add = function (obj, parent) {
         HTMLSync.instance.add(obj, parent);
     };
     HTMLSync.prototype.deleteObj = function (id) {
-        HTMLSync.socket.emit("delete", { roomId: this.room, id: id });
+        HTMLSync.socket.emit("delete", { roomId: HTMLSync.room, id: id });
     };
     HTMLSync.deleteObj = function (id) {
         HTMLSync.instance.deleteObj(id);

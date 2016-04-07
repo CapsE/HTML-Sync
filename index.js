@@ -16,6 +16,7 @@ var HTMLSync = (function () {
         else {
             HTMLSync.params = {};
         }
+        return this;
     }
     HTMLSync.setSocket = function (socket) {
         socket.on('update', function (msg) {
@@ -49,9 +50,11 @@ var HTMLSync = (function () {
                 console.log("join", msg);
             }
             var roomId = msg["room"];
+            if (!roomId) {
+                roomId = "/";
+            }
             socket.join(roomId);
             socket.roomId = roomId;
-            socket.to(roomId).emit("joined", { id: socket.id });
             var room = HTMLSync.getRoom(roomId);
             var forms = Object.keys(room.forms);
             for (var i = 0; i < forms.length; i++) {
@@ -66,6 +69,19 @@ var HTMLSync = (function () {
     HTMLSync.update = function (msg) {
         HTMLSync.updateForm(msg);
         HTMLSync.io.sockets.in(msg.roomId).emit('update', msg);
+    };
+    HTMLSync.add = function (part) {
+        var roomId;
+        if (part.roomId) {
+            roomId = part.roomId;
+        }
+        else {
+            roomId = "/";
+            part.roomId = roomId;
+        }
+        HTMLSync.parts[part.id] = part;
+        var room = HTMLSync.getRoom(roomId);
+        room.add(part);
     };
     HTMLSync.getRoom = function (roomId, callback) {
         var out;
@@ -90,7 +106,6 @@ var HTMLSync = (function () {
         HTMLSync.getRoom(fields.roomId, function (room) {
             var obj = room.forms[fields.id];
             if (obj) {
-                console.log("Object found updating");
                 for (var i in fields.style) {
                     eval("obj.style." + i + " = \"" + fields.style[i] + "\"");
                 }
@@ -106,7 +121,6 @@ var HTMLSync = (function () {
                 room.forms[fields.id] = obj;
             }
             else {
-                console.log("Object NOT found!");
                 var obj = room.updates[fields.id];
                 if (obj) {
                     for (var k in fields) {
@@ -122,6 +136,9 @@ var HTMLSync = (function () {
     };
     HTMLSync.Room = require("./room");
     HTMLSync.Part = require("./part");
+    HTMLSync.rooms = {};
+    HTMLSync.params = {};
+    HTMLSync.parts = {};
     return HTMLSync;
 })();
 module.exports = HTMLSync;

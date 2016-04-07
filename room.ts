@@ -18,6 +18,10 @@ class Room{
         this.forms = {};
         this.data = {};
     }
+
+    add(part:Part){
+        this.forms[part.id] = part.toJSON();
+    }
 }
 
 module.exports = Room;

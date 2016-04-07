@@ -23,9 +23,9 @@ class HTMLSync{
     static instance:HTMLSync;
     static Room  = require("./room");
     static Part = require("./part");
-    static rooms;
-    static params;
-    static parts;
+    static rooms = {};
+    static params = {};
+    static parts = {};
     static io;
 
     constructor(io:IO, params?){
@@ -41,6 +41,7 @@ class HTMLSync{
         }else {
             HTMLSync.params = {};
         }
+        return this;
     }
 
     static setSocket(socket:SocketIO){
@@ -78,10 +79,11 @@ class HTMLSync{
                 console.log("join", msg);
             }
             var roomId = msg["room"];
+            if(!roomId){
+                roomId = "/";
+            }
             socket.join(roomId);
             socket.roomId = roomId;
-
-            socket.to(roomId).emit("joined", {id: socket.id});
 
             var room = HTMLSync.getRoom(roomId);
             var forms = Object.keys(room.forms);
@@ -98,6 +100,20 @@ class HTMLSync{
     static update(msg){
         HTMLSync.updateForm(msg);
         HTMLSync.io.sockets.in(msg.roomId).emit('update', msg);
+    }
+
+    static add(part:Part){
+        var roomId;
+        if(part.roomId){
+            roomId = part.roomId;
+        }else{
+            roomId = "/";
+            part.roomId = roomId;
+        }
+        HTMLSync.parts[part.id] = part;
+
+        var room = HTMLSync.getRoom(roomId);
+        room.add(part);
     }
 
     static getRoom(roomId:string, callback?:(room) => any) {
@@ -123,7 +139,6 @@ class HTMLSync{
         HTMLSync.getRoom(fields.roomId, function(room){
             var obj = room.forms[fields.id];
             if(obj){
-                console.log("Object found updating");
                 for(var i in fields.style){
                     eval("obj.style." + i + " = \"" + fields.style[i] + "\"");
                 }
@@ -141,7 +156,6 @@ class HTMLSync{
                 }
                 room.forms[fields.id] = obj;
             }else{
-                console.log("Object NOT found!");
                 var obj = room.updates[fields.id]
                 if(obj){
                     for(var k in fields){
