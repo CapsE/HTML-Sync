@@ -51,7 +51,7 @@ class HTMLSync{
                 console.log("update", msg);
             }
             if (HTMLSync.parts[msg.id]) {
-                HTMLSync.parts[msg.id].update(msg, false);
+                HTMLSync.parts[msg.id].update(msg);
             }
         });
 
@@ -91,10 +91,6 @@ class HTMLSync{
             obj.parentElement.removeChild(obj);
 
             delete HTMLSync.parts[msg.id];
-        });
-
-        HTMLSync.socket.on("joined", function(msg){
-            console.log(msg.id);
         });
     }
 

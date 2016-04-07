@@ -35,7 +35,7 @@ var HTMLSync = (function () {
                 console.log("update", msg);
             }
             if (HTMLSync.parts[msg.id]) {
-                HTMLSync.parts[msg.id].update(msg, false);
+                HTMLSync.parts[msg.id].update(msg);
             }
         });
         HTMLSync.socket.on("add", function (msg) {
@@ -70,9 +70,6 @@ var HTMLSync = (function () {
             HTMLSync.parts[msg.id].kill();
             obj.parentElement.removeChild(obj);
             delete HTMLSync.parts[msg.id];
-        });
-        HTMLSync.socket.on("joined", function (msg) {
-            console.log(msg.id);
         });
     }
     HTMLSync.prototype.update = function (obj) {
