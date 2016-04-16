@@ -155,9 +155,6 @@ class Part{
                 result.push(_.bind(func[i], this)(e));
             }
         }
-        if(result.length == 1){
-            result = result[0];
-        }
         return result;
     }
 

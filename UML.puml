@@ -1,0 +1,112 @@
+@startuml
+
+Namespace Server{
+
+    class Part{
+        void addChild(Part p)
+        void css(string, string)
+        void css(JSON)
+        void attr(string, string)
+        void attr(JSON)
+
+        void addInclude(string)
+
+        string type
+        Part[] content
+        JSON style
+        JSON attributes
+
+        <static> string[] includes
+        Part parent
+    }
+
+    class HTMLSync{
+        <static> void setSocket(Socket)
+        <static> void update(JSON)
+        <static> void add(Part)
+        <static> Room getRoom(string)
+        <static> updateForm() ???
+
+        <static> HTMLSync instance
+        <static> {string: Room} rooms
+        <static> JSON params
+        <static> {string: Part} parts
+        <staitc> SocketIO io
+    }
+
+    class Room{
+        void add(Part)
+        JSON updates
+        JSON data
+        string roomId
+    }
+
+    HTMLSync "1" <-- "*" Room : manages
+    HTMLSync "1" <-- "*" Part : stores
+}
+
+class Syncable{
+    void update(JSON, bool)
+    JSON toJSON()
+    void setId(string)
+    void on(string, function)
+    [any] call(string, any)
+    void kill()
+
+    string id
+    string name
+    <static> number counter
+    JSON data
+    {string: function[]} functions
+}
+Client.Part <|-- Syncable
+Server.Part <|-- Syncable
+
+Namespace Client{
+
+    class Part{
+        void addChild(Part p)
+        void css(string, string)
+        void css(JSON)
+        void attr(string, string)
+        void attr(JSON)
+
+        HTML-Node html()
+        void renderHTML(HTML-Node)
+
+        void addInclude(string)
+
+        string id
+        string name
+        <static> number counter
+        string type
+        Part[] content
+        JSON style
+        JSON attributes
+        JSON data
+        {string: function[]} functions
+        <static> string[] includes
+        Part parent
+    }
+
+    class HTMLSync{
+        <static> void update(JSON)
+        void update(JSON)
+        <static> void add(Part)
+        void add(Part)
+        <static> deleteObj(string)
+        deleteObj(string)
+
+        <static> HTMLSync instance
+        <static> string room
+        <static> JSON params
+        <static> {string: Part} parts
+        <static> Socket socket
+    }
+
+    HTMLSync <-- Part
+}
+
+
+
+@enduml
