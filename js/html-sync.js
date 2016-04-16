@@ -35,7 +35,7 @@ var HTMLSync = (function () {
                 console.log("update", msg);
             }
             if (HTMLSync.parts[msg.id]) {
-                HTMLSync.parts[msg.id].update(msg, false);
+                HTMLSync.parts[msg.id].update(msg);
             }
         });
         HTMLSync.socket.on("add", function (msg) {
