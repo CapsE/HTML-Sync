@@ -44,6 +44,7 @@ var HTMLSync = (function () {
             }
             var p = new Part("", msg);
             if (!msg.parent) {
+                console.log("Rendering HTML");
                 p.renderHTML();
             }
             else {
@@ -108,5 +109,5 @@ var HTMLSync = (function () {
         HTMLSync.instance.deleteObj(id);
     };
     return HTMLSync;
-})();
+}());
 //# sourceMappingURL=html-sync.js.map

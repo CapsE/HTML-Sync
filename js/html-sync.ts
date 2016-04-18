@@ -62,6 +62,7 @@ class HTMLSync{
             var p = new Part("", msg);
 
             if (!msg.parent) {
+                console.log("Rendering HTML");
                 p.renderHTML();
             } else {
                 p.renderHTML(document.getElementById(msg.parent));

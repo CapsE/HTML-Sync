@@ -20,19 +20,9 @@ Namespace Server{
         Part parent
     }
 
-    class HTMLSync{
-        <static> void setSocket(Socket)
-        <static> void update(JSON)
-        <static> void add(Part)
-        <static> Room getRoom(string)
-        <static> updateForm() ???
 
-        <static> HTMLSync instance
-        <static> {string: Room} rooms
-        <static> JSON params
-        <static> {string: Part} parts
-        <staitc> SocketIO io
-    }
+
+
 
     class Room{
         void add(Part)
