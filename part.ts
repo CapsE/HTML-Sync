@@ -116,18 +116,15 @@ class Part extends Syncable{
      * @returns {{id: string, type: string, content: Array, style: any, attributes: any, functions: any}}
      */
     toJSON(){
-        var json = {
-            id: this.id,
-            type: this.type,
-            namespace: this.namespace,
-            content: [],
-            style: this.style,
-            attributes: this.attributes,
-            functions: this.functions,
-            handlers: this.handlers,
-            data: this.data,
-            includes: Part.includes
-        };
+        var json = super.toJSON();
+
+        json.type = this.type;
+        json.namespace= this.namespace;
+        json.content= [];
+        json.style= this.style;
+        json.attributes= this.attributes;
+        json.includes= Part.includes;
+
         for(var p in this.content){
             json.content.push(this.content[p].toJSON());
         }

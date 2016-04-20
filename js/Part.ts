@@ -4,29 +4,24 @@
 
 /// <reference path="./typings/lib.dom.d.ts"/>
 /// <reference path="html-sync.ts"/>
+/// <reference path="syncable.ts"/>
 
 interface UpdateData {
     style?: any;
     attributes?: any;
-    data?: any;
-    functions?: any;
-    calls?:[any];
 }
 
 /**
  * Base Class for the synchronized working. Represents more or less a HTML-Tag.
  */
-class Part{
-    id:string;
-    name:string;
-    static counter:number = 0;
+class Part extends Syncable{
+
     type:string;
     namespace:string;
     content:Part[] = [];
     style: any = {};
     attributes: any = {};
-    data: any = {};
-    functions: any = {};
+
     handlers: any = {};
     static includes: string[] = [];
     static includesToLoad: number = 0;
@@ -37,6 +32,7 @@ class Part{
      * Create either with just a type like "div" or with a hash-map with all relevant fields set.
      */
     constructor(type:string, json?:any){
+        super();
         if(json){
             if(!json.id || json.id == ""){
                 var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
@@ -51,6 +47,7 @@ class Part{
             this.style = json.style;
             this.attributes = json.attributes;
             this.functions = json.functions;
+            this.handlers = json.handlers;
             this.data = json.data;
             Part.includes = json.includes;
 
@@ -63,7 +60,7 @@ class Part{
             Part.counter++;
             this.type = type;
         }
-        HTMLSync.parts[this.id] = this;
+
     }
 
     /**
@@ -110,18 +107,6 @@ class Part{
         }
     }
 
-    on(attribute: string, value: any){
-        this.addEventHandler(attribute, value);
-    }
-
-    addEventHandler(attribute: string, value: any){
-        if(!this.functions[attribute]){
-            this.functions[attribute] = [];
-        }
-        this.functions[attribute].push(value);
-        this.handlers[attribute] = true;
-    }
-
     addInclude(incl: string){
         Part.includes.push(incl);
     }
@@ -145,17 +130,6 @@ class Part{
         }
 
         return f;
-    }
-
-    call(func, e){
-        var result = [];
-        var func = this.functions[func];
-        if(func){
-            for(var i=0, y = func.length; i < y; i++){
-                result.push(_.bind(func[i], this)(e));
-            }
-        }
-        return result;
     }
 
     /**
@@ -246,53 +220,7 @@ class Part{
         return "HTMLSync.parts['" + this.id + "']";
     }
 
-    /**
-     * Finds the HTML-Element and applies all attributes, styles and functions again with the current state.
-     */
-    update(fields?:UpdateData, send?:boolean){
-        if(send === "undefined"){
-            send = true;
-        }
-        if(!fields){
-            this.renderHTML();
-        }else if(!send){
-            var element = document.getElementById(this.id);
-            if(!element){
-                return false;
-            }
-            for(var i in fields.style){
-                eval("this.style." + i + " = \"" + fields.style[i] + "\"");
-                eval("element.style." + i + " = \"" + fields.style[i] + "\"");
-            }
 
-            for(var i in fields.attributes){
-                eval("this.attributes." + i + " = \"" + fields.attributes[i] + "\"");
-                eval("element." + i + " = \"" + fields.attributes[i] + "\"");
-            }
-
-            for(var i in fields.data){
-                eval("this.data." + i + " = \"" + fields.data[i] + "\"");
-                eval("element.dataset." + i + " = \"" + fields.data[i] + "\"");
-            }
-
-            for(var i in fields.functions){
-                console.debug(fields.functions[i]);
-                eval("this.functions['" + i + "'] = " + this.prepareFunction(fields.functions[i]) + " )");
-                eval("element.addEventListener('" + i + "', " + this.prepareFunction(fields.functions[i]) + " )");
-            }
-
-            for(var i in fields.calls){
-                var event = new CustomEvent(fields.calls[i].name, {detail: fields.calls[i].detail});
-                this.html().dispatchEvent(event);
-            }
-        }
-        if(send){
-            fields.id = this.id;
-            fields.roomId = HTMLSync.room;
-            HTMLSync.update(fields);
-        }
-        this.raiseEvent("updated", {}, true, true);
-    }
 
     /**
      * Convertes this Object to a JSON which is ready to be synchronized with other clients.
@@ -346,15 +274,12 @@ class Part{
 
         for(var i in this.functions){
             for(var x =0, y = this.functions[i].length; x < y; x++){
-                console.log("this.functions['" + i + "'][" + x + "] = " + this.functions[i][x] );
                 eval("this.functions['" + i + "'][" + x + "] = " + this.functions[i][x]);
             }
-
             console.log(this.functions[i]);
-
-
         }
 
+        console.log("Handlers",this.handlers);
         for(var i in this.handlers){
             eval("newElement.addEventListener('" + i + "', function(e){HTMLSync.parts['" + this.id +"'].call('"+ i + "',e);})");
         }
@@ -394,11 +319,8 @@ class Part{
             this.content[i].renderHTML(newElement);
         }
 
-        var event = new CustomEvent("added", { "detail": "", "id": this.id });
-
         target.appendChild(newElement);
-        // Dispatch/Trigger/Fire the event
-        newElement.dispatchEvent(event);
+
     }
 
     changeId(id:string, mainId?:string){
@@ -432,14 +354,6 @@ class Part{
 
         if(this.id == mainId) this.id = id;
     }
-
-    kill(){
-        for(var x = 0; x < this.content.length; x++){
-            this.content[x].kill();
-        }
-        for(var i = 0; i < this.intervals.length; i++){
-            console.debug("Clearing interval" + this.intervals[i]);
-            clearInterval(this.intervals[i]);
-        }
-    }
 }
+
+module.exports = Part;

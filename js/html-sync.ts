@@ -40,7 +40,7 @@ class HTMLSync{
             HTMLSync.room = "/";
         }
 
-        HTMLSync.socket.emit("join",{room: HTMLSync.room} );
+        HTMLSync.socket.emit("join",{room: this.room} );
 
         if(!HTMLSync.parts){
             HTMLSync.parts = {};

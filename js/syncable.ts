@@ -74,7 +74,7 @@ class Syncable{
      * Finds the HTML-Element and applies all attributes, styles and functions again with the current state.
      */
     update(fields?:UpdateData, send?:boolean){
-        if(send === "undefined"){
+        if(typeof(send) === "undefined"){
             send = true;
         }
         if(!fields){
@@ -123,6 +123,7 @@ class Syncable{
      */
     toJSON(){
         var stringFunctions = this.functions;
+        console.log(stringFunctions);
         for(var i in this.functions){
             for(var x =0, y = this.functions[i].length; x < y; x++){
                 stringFunctions[i][x] = this.functions[i][x].toString();
@@ -185,6 +186,4 @@ class Syncable{
     }
 }
 
-if(typeof (module) !== "undefined"){
-    module.exports = Syncable;
-}
+module.exports = Syncable;
