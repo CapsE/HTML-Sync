@@ -103,16 +103,16 @@ class HTMLSync{
     }
 
     static add(part:Part){
-        var roomId;
-        if(part.roomId){
-            roomId = part.roomId;
+        var room;
+        if(part.room){
+            room = part.room;
         }else{
-            roomId = "/";
-            part.roomId = roomId;
+            room = "/";
+            part.room = room;
         }
         HTMLSync.parts[part.id] = part;
 
-        var room = HTMLSync.getRoom(roomId);
+        var room = HTMLSync.getRoom(room);
         room.add(part);
     }
 
@@ -132,6 +132,14 @@ class HTMLSync{
             callback(out);
         }else {
             return out;
+        }
+    }
+
+    static roomExists(roomId:string){
+        if(HTMLSync.rooms[roomId]) {
+            return true;
+        }else{
+            return false;
         }
     }
 

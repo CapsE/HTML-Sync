@@ -100,7 +100,6 @@ class Syncable{
             }
 
             for(var i in fields.functions){
-                console.debug(fields.functions[i]);
                 eval("this.functions['" + i + "'] = " + this.prepareFunction(fields.functions[i]) + " )");
                 eval("element.addEventListener('" + i + "', " + this.prepareFunction(fields.functions[i]) + " )");
             }
@@ -184,4 +183,8 @@ class Syncable{
             clearInterval(this.intervals[i]);
         }
     }
+}
+
+if(typeof (module) !== "undefined"){
+    module.exports = Syncable;
 }

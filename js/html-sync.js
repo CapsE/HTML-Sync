@@ -26,7 +26,7 @@ var HTMLSync = (function () {
         else {
             HTMLSync.room = "/";
         }
-        HTMLSync.socket.emit("join", { room: this.room });
+        HTMLSync.socket.emit("join", { room: HTMLSync.room });
         if (!HTMLSync.parts) {
             HTMLSync.parts = {};
         }
@@ -44,7 +44,6 @@ var HTMLSync = (function () {
             }
             var p = new Part("", msg);
             if (!msg.parent) {
-                console.log("Rendering HTML");
                 p.renderHTML();
             }
             else {

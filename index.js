@@ -71,16 +71,16 @@ var HTMLSync = (function () {
         HTMLSync.io.sockets.in(msg.roomId).emit('update', msg);
     };
     HTMLSync.add = function (part) {
-        var roomId;
-        if (part.roomId) {
-            roomId = part.roomId;
+        var room;
+        if (part.room) {
+            room = part.room;
         }
         else {
-            roomId = "/";
-            part.roomId = roomId;
+            room = "/";
+            part.room = room;
         }
         HTMLSync.parts[part.id] = part;
-        var room = HTMLSync.getRoom(roomId);
+        var room = HTMLSync.getRoom(room);
         room.add(part);
     };
     HTMLSync.getRoom = function (roomId, callback) {
@@ -100,6 +100,14 @@ var HTMLSync = (function () {
         }
         else {
             return out;
+        }
+    };
+    HTMLSync.roomExists = function (roomId) {
+        if (HTMLSync.rooms[roomId]) {
+            return true;
+        }
+        else {
+            return false;
         }
     };
     HTMLSync.updateForm = function (fields) {
@@ -140,6 +148,6 @@ var HTMLSync = (function () {
     HTMLSync.params = {};
     HTMLSync.parts = {};
     return HTMLSync;
-})();
+}());
 module.exports = HTMLSync;
 //# sourceMappingURL=index.js.map

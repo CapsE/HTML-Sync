@@ -7,7 +7,8 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                sourceMap:true,
             },
             build: {
                 src: ['js/lib/socket.io.js', 'js/lib/underscore.js', 'js/html-sync.js','js/syncable.js', 'js/part.js'],
@@ -16,12 +17,28 @@ module.exports = function(grunt) {
         },
         copy: {
             main: {
-                files: [
+                triangles: [
                     // includes files within path
-                    {expand: true, src: ['index.js', 'part.js', 'room.js'], dest: '../HTML-Sync-Examples/HelloWorld/node_modules/html-sync', filter: 'isFile'},
+                    {expand: true, src: ['index.ts', 'part.ts', 'room.ts'], dest: '../HTML-Sync-Examples/Triangles/node_modules/html-sync', filter: 'isFile'},
+                    {expand: true, src: ['js/*'], dest: '../HTML-Sync-Examples/Triangles/node_modules/html-sync/js', filter: 'isFile'},
+                    
+                    {expand: true, src: ['html-sync.min.js'], dest: '../HTML-Sync-Examples/Triangles/public'},
 
-                    // includes files within path and its sub-directories
+                ],
+                helloWorld: [
+                    // includes files within path
+                    {expand: true, src: ['index.ts', 'part.ts', 'room.ts'], dest: '../HTML-Sync-Examples/HelloWorld/node_modules/html-sync', filter: 'isFile'},
+                    {expand: true, src: ['js/*'], dest: '../HTML-Sync-Examples/HelloWorld/node_modules/html-sync/js', filter: 'isFile'},
+
                     {expand: true, src: ['html-sync.min.js'], dest: '../HTML-Sync-Examples/HelloWorld/public'},
+
+                ],
+                stars: [
+                    // includes files within path
+                    {expand: true, src: ['index.ts', 'part.ts', 'room.ts'], dest: '../HTML-Sync-Examples/ThousandStars/node_modules/html-sync', filter: 'isFile'},
+                    {expand: true, src: ['js/*'], dest: '../HTML-Sync-Examples/ThousandStars/node_modules/html-sync/js', filter: 'isFile'},
+
+                    {expand: true, src: ['html-sync.min.js'], dest: '../HTML-Sync-Examples/ThousandStars/public'},
 
                 ],
             },
@@ -35,6 +52,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask('default', ['uglify']);
-    grunt.registerTask('cp', ['uglify','copy:main:files']);
+    grunt.registerTask('cp', ['uglify','copy:main:triangles','copy:main:helloWorld','copy:main:stars']);
 
 };
