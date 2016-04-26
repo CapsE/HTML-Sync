@@ -22,6 +22,15 @@ class Room{
     add(part:Part){
         this.forms[part.id] = part.toJSON();
     }
+
+    toJSON(){
+        return {
+            updates: this.updates,
+            forms: this.forms,
+            data: this.data,
+            id: this.roomId
+        }
+    }
 }
 
 module.exports = Room;
