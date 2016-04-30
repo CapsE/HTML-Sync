@@ -110,8 +110,19 @@ class Syncable{
             }
 
             for(var i in fields.calls){
-                var event = new CustomEvent(fields.calls[i].name, {detail: fields.calls[i].detail});
-                this.html().dispatchEvent(event);
+                if(this.html){
+                    var event = new CustomEvent(fields.calls[i].name, {detail: fields.calls[i].detail});
+                    this.html().dispatchEvent(event);
+                }else{
+                    var name = fields.calls[i].name;
+                    var detail = fields.calls[i].detail;
+                    if(this.functions[i]){
+                        for(var f in this.functions[i]){
+                            var func = eval(this.functions[i][f]);
+                            func(detail);
+                        }
+                    }
+                }
             }
         }
         if(send){

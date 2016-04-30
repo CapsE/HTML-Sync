@@ -46,6 +46,7 @@ class Part extends Syncable{
             }
             this.type = json.type;
             this.name = json.name;
+            this.parent = json.parent;
             this.namespace = json.namespace;
             this.content = [];
             this.style = json.style;

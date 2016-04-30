@@ -44,6 +44,7 @@ class Part extends Syncable{
             }
             this.type = json.type;
             this.namespace = json.namespace;
+            this.parent = json.parent;
             this.name = json.name;
             this.content = [];
             this.style = json.style;
@@ -178,7 +179,7 @@ class Part extends Syncable{
                 }
             }else{
                 p.html().dispatchEvent(event);
-                while(p.parent){
+                while(p.parent && p.parent.html){
                     p = p.parent;
                     p.html().dispatchEvent(event);
                 }
@@ -248,6 +249,10 @@ class Part extends Syncable{
             data: this.data,
             includes: Part.includes
         };
+
+        if(!this.parent.toJSON){
+            json.parent = this.parent;
+        }
         for(var p in this.content){
             json.content.push(this.content[p].toJSON());
         }
@@ -369,5 +374,3 @@ class Part extends Syncable{
         if(this.id == mainId) this.id = id;
     }
 }
-
-module.exports = Part;
