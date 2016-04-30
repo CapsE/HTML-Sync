@@ -22,6 +22,7 @@ if(require){
  */
 class Part extends Syncable{
     type:string;
+    name:string;
     namespace:string;
     room:string;
     content:Part[] = [];
@@ -44,6 +45,7 @@ class Part extends Syncable{
                 this.id = json.id;
             }
             this.type = json.type;
+            this.name = json.name;
             this.namespace = json.namespace;
             this.content = [];
             this.style = json.style;
@@ -119,6 +121,7 @@ class Part extends Syncable{
         var json = super.toJSON();
 
         json.type = this.type;
+        json.name = this.name;
         json.namespace= this.namespace;
         json.content= [];
         json.style= this.style;

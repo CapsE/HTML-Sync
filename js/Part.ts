@@ -17,6 +17,7 @@ interface UpdateData {
 class Part extends Syncable{
 
     type:string;
+    name:string;
     namespace:string;
     content:Part[] = [];
     style: any = {};
@@ -43,6 +44,7 @@ class Part extends Syncable{
             }
             this.type = json.type;
             this.namespace = json.namespace;
+            this.name = json.name;
             this.content = [];
             this.style = json.style;
             this.attributes = json.attributes;
@@ -233,7 +235,19 @@ class Part extends Syncable{
                 stringFunctions[i][x] = this.functions[i][x].toString();
             }
         }
-        var json = {id: this.id, type: this.type, namespace: this.namespace, content: [], style: this.style, attributes: this.attributes, functions: stringFunctions, handlers: this.handlers, data: this.data, includes: Part.includes};
+        var json = {
+            id: this.id,
+            type: this.type,
+            name: this.name,
+            namespace: this.namespace,
+            content: [],
+            style: this.style,
+            attributes: this.attributes,
+            functions: stringFunctions,
+            handlers: this.handlers,
+            data: this.data,
+            includes: Part.includes
+        };
         for(var p in this.content){
             json.content.push(this.content[p].toJSON());
         }
