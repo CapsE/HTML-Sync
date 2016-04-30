@@ -129,7 +129,6 @@ class Syncable{
      */
     toJSON(){
         var stringFunctions = this.functions;
-        console.log(stringFunctions);
         for(var i in this.functions){
             for(var x =0, y = this.functions[i].length; x < y; x++){
                 stringFunctions[i][x] = this.functions[i][x].toString();

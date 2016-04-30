@@ -172,7 +172,18 @@ class HTMLSync extends EventEmitter{
                 }
 
                 for(var i in fields.functions){
-                    eval("obj.functions['" + i + "'] = " + this.prepareFunction(fields.functions[i]) + " )");
+                    eval("obj.functions['" + i + "'] = " + fields.functions[i] + " )");
+                }
+
+                for(var i in fields.calls){
+                    var name = fields.calls[i].name;
+                    var detail = fields.calls[i].detail;
+                    if(obj.functions[i]){
+                        for(var f in obj.functions[i]){
+                            var func = eval(obj.functions[i][f]);
+                            func(detail);
+                        }
+                    }
                 }
                 room.forms[fields.id] = obj;
             }else{
