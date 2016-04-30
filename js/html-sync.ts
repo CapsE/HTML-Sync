@@ -40,7 +40,7 @@ class HTMLSync{
             HTMLSync.room = "/";
         }
 
-        HTMLSync.socket.emit("join",{room: this.room} );
+        HTMLSync.socket.emit("join",{room: HTMLSync.room} );
 
         if(!HTMLSync.parts){
             HTMLSync.parts = {};
@@ -51,7 +51,7 @@ class HTMLSync{
                 console.log("update", msg);
             }
             if (HTMLSync.parts[msg.id]) {
-                HTMLSync.parts[msg.id].update(msg);
+                HTMLSync.parts[msg.id].update(msg, false);
             }
         });
 

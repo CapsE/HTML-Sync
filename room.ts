@@ -31,6 +31,14 @@ class Room{
             id: this.roomId
         }
     }
+
+    hasParts(){
+        if(Object.keys(this.forms).length == 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
 }
 
 module.exports = Room;

@@ -1,8 +1,15 @@
 /**
  * Created by Lars on 22.02.2016.
  */
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 /// <reference path="./js/typings/socket.io.d.ts"/>
-var HTMLSync = (function () {
+var EventEmitter = require("events");
+var HTMLSync = (function (_super) {
+    __extends(HTMLSync, _super);
     function HTMLSync(io, params) {
         if (!HTMLSync.instance) {
             HTMLSync.instance = this;
@@ -19,7 +26,9 @@ var HTMLSync = (function () {
         return this;
     }
     HTMLSync.setSocket = function (socket) {
+        HTMLSync.socket = socket;
         socket.on('update', function (msg) {
+            HTMLSync.instance.emit("update", msg, socket);
             if (HTMLSync.params.debug) {
                 console.log("update", msg);
             }
@@ -27,6 +36,7 @@ var HTMLSync = (function () {
             HTMLSync.io.sockets.in(msg.roomId).emit('update', msg);
         });
         socket.on('add', function (msg) {
+            HTMLSync.instance.emit("add", msg, socket);
             if (HTMLSync.params.debug) {
                 console.log("add", msg);
             }
@@ -36,6 +46,7 @@ var HTMLSync = (function () {
             });
         });
         socket.on('delete', function (msg) {
+            HTMLSync.instance.emit("delete", msg, socket);
             if (HTMLSync.params.debug) {
                 console.log("delete", msg);
             }
@@ -46,6 +57,7 @@ var HTMLSync = (function () {
             HTMLSync.io.sockets.in(msg.roomId).emit('delete', msg);
         });
         socket.on("join", function (msg) {
+            HTMLSync.instance.emit("join", msg, socket);
             if (HTMLSync.params.debug) {
                 console.log("join", msg);
             }
@@ -118,7 +130,10 @@ var HTMLSync = (function () {
                     eval("obj.style." + i + " = \"" + fields.style[i] + "\"");
                 }
                 for (var i in fields.attributes) {
-                    eval("obj." + i + " = \"" + fields.attributes[i] + "\"");
+                    eval("obj.attributes." + i + " = \"" + fields.attributes[i] + "\"");
+                }
+                for (var i in fields.attr) {
+                    eval("obj.attributes." + i + " = \"" + fields.attr[i] + "\"");
                 }
                 for (var i in fields.data) {
                     eval("obj.data." + i + " = \"" + fields.data[i] + "\"");
@@ -148,6 +163,6 @@ var HTMLSync = (function () {
     HTMLSync.params = {};
     HTMLSync.parts = {};
     return HTMLSync;
-}());
+}(EventEmitter));
 module.exports = HTMLSync;
 //# sourceMappingURL=index.js.map

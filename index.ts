@@ -7,6 +7,8 @@
 declare var module;
 declare var require;
 
+var EventEmitter = require("events");
+
 interface SocketIO{
     on(name:string, callback:any);
     join(room:string);
@@ -18,7 +20,7 @@ interface IO{
     sockets;
 }
 
-class HTMLSync{
+class HTMLSync extends EventEmitter{
 
     static instance:HTMLSync;
     static Room  = require("./room");
@@ -27,6 +29,7 @@ class HTMLSync{
     static params = {};
     static parts = {};
     static io;
+    static socket;
 
     constructor(io:IO, params?){
         if(!HTMLSync.instance) {
@@ -45,7 +48,9 @@ class HTMLSync{
     }
 
     static setSocket(socket:SocketIO){
+        HTMLSync.socket = socket;
         socket.on('update', function(msg){
+            HTMLSync.instance.emit("update", msg, socket);
             if(HTMLSync.params.debug){
                 console.log("update", msg);
             }
@@ -54,6 +59,7 @@ class HTMLSync{
         });
 
         socket.on('add', function(msg){
+            HTMLSync.instance.emit("add", msg, socket);
             if(HTMLSync.params.debug){
                 console.log("add", msg);
             }
@@ -64,6 +70,7 @@ class HTMLSync{
         });
 
         socket.on('delete', function(msg){
+            HTMLSync.instance.emit("delete", msg, socket);
             if(HTMLSync.params.debug){
                 console.log("delete", msg);
             }
@@ -75,6 +82,7 @@ class HTMLSync{
         });
 
         socket.on("join", function(msg){
+            HTMLSync.instance.emit("join", msg, socket);
             if(HTMLSync.params.debug){
                 console.log("join", msg);
             }
@@ -152,7 +160,11 @@ class HTMLSync{
                 }
 
                 for(var i in fields.attributes){
-                    eval("obj." + i + " = \"" + fields.attributes[i] + "\"");
+                    eval("obj.attributes." + i + " = \"" + fields.attributes[i] + "\"");
+                }
+
+                for(var i in fields.attr){
+                    eval("obj.attributes." + i + " = \"" + fields.attr[i] + "\"");
                 }
 
                 for(var i in fields.data){

@@ -94,6 +94,11 @@ class Syncable{
                 eval("element." + i + " = \"" + fields.attributes[i] + "\"");
             }
 
+            for(var i in fields.attr){
+                eval("this.attributes." + i + " = \"" + fields.attr[i] + "\"");
+                eval("element." + i + " = \"" + fields.attr[i] + "\"");
+            }
+
             for(var i in fields.data){
                 eval("this.data." + i + " = \"" + fields.data[i] + "\"");
                 eval("element.dataset." + i + " = \"" + fields.data[i] + "\"");
@@ -112,6 +117,7 @@ class Syncable{
         if(send){
             fields.id = this.id;
             fields.roomId = HTMLSync.room;
+            fields.attributes = fields.attr;
             HTMLSync.update(fields);
         }
         this.raiseEvent("updated", {}, true, true);
@@ -186,4 +192,6 @@ class Syncable{
     }
 }
 
-module.exports = Syncable;
+if(typeof(module) !== "undefined"){
+    module.exports = Syncable;
+}

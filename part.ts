@@ -124,6 +124,9 @@ class Part extends Syncable{
         json.style= this.style;
         json.attributes= this.attributes;
         json.includes= Part.includes;
+        if(!this.parent.toJSON){
+            json.parent = this.parent;
+        }
 
         for(var p in this.content){
             json.content.push(this.content[p].toJSON());
