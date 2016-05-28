@@ -339,7 +339,7 @@ class Part extends Syncable{
         }
 
         target.appendChild(newElement);
-
+        this.call("added", {});
     }
 
     changeId(id:string, mainId?:string){
