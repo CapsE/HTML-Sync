@@ -1,6 +1,6 @@
 {
   "name": "html-sync",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Syncs HTML-Elements across multiple clients",
   "main": "app.js",
   "scripts": {
@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/CapsE/HTML-Sync",
   "dependencies": {
-    "socket.io": "*"
+    "socket.io": "^1.4.6"
   },
   "readme": "HTML-Sync.js\r\n=========================\r\nHTML-Sync.js allows you to synchronize changes a user made on your website with other users to create a cooperative experience.\r\nThe library uses Socket.io to send JSON-objects that represent HTML-structures. The library is easily integratet in an existing Node.js Server.\r\n\r\nClient - Side\r\n-------------------------\r\nThe library implements the Part-class. This class represents a synchronizeable HTML-node. This node has attributes, styles, event-handlers and child elements just like a regular HTML-node does.\r\nThe Part class keeps the methods you might know from JQuery. \r\n\r\n```js\r\nvar div = new Part(\"div\");\r\ndiv.css(\"width\", \"200px\");\r\ndiv.attr(\"className\", \"example\");\r\ndiv.on(\"click\", function(){\r\n    alert(\"Div got clicked!\");\r\n});\r\n```\r\n\r\nIf you want to set multiple styles or attributes at once you can!\r\n\r\n```js\r\nvar img = new Part(\"img\");\r\nimg.css({\r\n    width:\"100px\",\r\n    height:\"100px\"\r\n});\r\nimg.attr({\r\n    src=\"/example_img.png\",\r\n    className=\"example-image\"\r\n});\r\n```\r\n\r\nNow you created you Part you want to add it to the document. To do so use the following code:\r\n\r\n```js\r\nvar head = new Part(\"h1\");\r\nhead.attr(\"innerHTML\", \"Hello World!\");\r\nHTMLSync.add(head);\r\n```\r\n\r\nThis will add the H1-tag for every user currently on you website and everybody that will visit it from now on. Usually objects get added to the body of the document but HTMLSync.add also has a second parameter you can use to set a parent element for your new object.\r\n\r\n```html\r\n<body>\r\n    <header id=\"header\"></header>\r\n    <div id=\"main-page\">\r\n        Some content\r\n    </div>\r\n</body>\r\n```\r\n\r\n```js\r\nvar head = new Part(\"h1\");\r\nhead.attr(\"innerHTML\", \"Hello World!\");\r\nHTMLSync.add(head, \"header\");\r\n```\r\n",
   "readmeFilename": "README.md",
