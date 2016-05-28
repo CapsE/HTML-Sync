@@ -39,7 +39,6 @@ class Syncable{
     void update(JSON, bool)
     JSON toJSON()
     void setId(string)
-    void on(string, function)
     [any] call(string, any)
     void kill()
 
@@ -47,10 +46,36 @@ class Syncable{
     string name
     <static> number counter
     JSON data
-    {string: function[]} functions
+    {string:function} functions
 }
 Client.Part <|-- Syncable
 Server.Part <|-- Syncable
+
+Namespace NodeJS{
+    class EventEmitter{
+        Event: 'newListener'
+        Event: 'removeListener'
+        EventEmitter.listenerCount(emitter, eventName)
+        EventEmitter.defaultMaxListeners
+        emitter.addListener(eventName, listener)
+        emitter.emit(eventName[, arg1][, arg2][, ...])
+        emitter.eventNames()
+        emitter.getMaxListeners()
+        emitter.listenerCount(eventName)
+        emitter.listeners(eventName)
+        emitter.on(eventName, listener)
+        emitter.once(eventName, listener)
+        emitter.prependListener(eventName, listener)
+        emitter.prependOnceListener(eventName, listener)
+        emitter.removeAllListeners([eventName])
+        emitter.removeListener(eventName, listener)
+        emitter.setMaxListeners(n)
+    }
+}
+
+Server.HTMLSync <|-- NodeJS.EventEmitter
+Client.HTMLSync <|-- NodeJS.EventEmitter
+Server.Room <|-- NodeJS.EventEmitter
 
 Namespace Client{
 
@@ -74,7 +99,6 @@ Namespace Client{
         JSON style
         JSON attributes
         JSON data
-        {string: function[]} functions
         <static> string[] includes
         Part parent
     }
