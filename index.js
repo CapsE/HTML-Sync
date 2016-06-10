@@ -11,6 +11,7 @@ var EventEmitter = require("events");
 var HTMLSync = (function (_super) {
     __extends(HTMLSync, _super);
     function HTMLSync(io, params) {
+        _super.call(this);
         if (!HTMLSync.instance) {
             HTMLSync.instance = this;
             HTMLSync.io = io;
@@ -18,7 +19,9 @@ var HTMLSync = (function (_super) {
             HTMLSync.parts = {};
         }
         if (params) {
-            HTMLSync.params = params;
+            for (var key in params) {
+                HTMLSync.params[key] = params[key];
+            }
         }
         else {
             HTMLSync.params = {};
@@ -32,8 +35,9 @@ var HTMLSync = (function (_super) {
             if (HTMLSync.params.debug) {
                 console.log("update", msg);
             }
-            HTMLSync.updateForm(msg);
-            socket.broadcast.emit('update', msg);
+            HTMLSync.updateForm(msg, socket.id).then(function () {
+                socket.broadcast.emit('update', msg);
+            });
         });
         socket.on('add', function (msg) {
             HTMLSync.instance.emit("add", msg, socket);
@@ -122,55 +126,74 @@ var HTMLSync = (function (_super) {
             return false;
         }
     };
-    HTMLSync.updateForm = function (fields) {
-        HTMLSync.getRoom(fields.roomId, function (room) {
-            var obj = room.forms[fields.id];
-            if (obj) {
-                for (var i in fields.style) {
-                    eval("obj.style." + i + " = \"" + fields.style[i] + "\"");
-                }
-                for (var i in fields.attributes) {
-                    eval("obj.attributes." + i + " = \"" + fields.attributes[i] + "\"");
-                }
-                for (var i in fields.attr) {
-                    eval("obj.attributes." + i + " = \"" + fields.attr[i] + "\"");
-                }
-                for (var i in fields.data) {
-                    eval("obj.data." + i + " = \"" + fields.data[i] + "\"");
-                }
-                for (var i in fields.functions) {
-                    eval("obj.functions['" + i + "'] = " + fields.functions[i] + " )");
-                }
-                for (var i in fields.calls) {
-                    var name = fields.calls[i].name;
-                    var detail = fields.calls[i].detail;
-                    if (obj.functions[i]) {
-                        for (var f in obj.functions[i]) {
-                            var func = eval(obj.functions[i][f]);
-                            func(detail);
+    HTMLSync.updateForm = function (fields, key) {
+        return new Promise(function (resolve, reject) {
+            HTMLSync.getRoom(fields.roomId, function (room) {
+                var obj = room.forms[fields.id];
+                if (obj) {
+                    if (key) {
+                        if (obj.key && key != obj.key) {
+                            reject();
+                            return;
                         }
                     }
-                }
-                room.forms[fields.id] = obj;
-            }
-            else {
-                var obj = room.updates[fields.id];
-                if (obj) {
-                    for (var k in fields) {
-                        obj[k] = fields[k];
+                    for (var i in fields.style) {
+                        eval("obj.style." + i + " = \"" + fields.style[i] + "\"");
                     }
-                    room.updates[fields.id] = obj;
+                    for (var i in fields.attributes) {
+                        eval("obj.attributes." + i + " = \"" + fields.attributes[i] + "\"");
+                    }
+                    for (var i in fields.attr) {
+                        eval("obj.attributes." + i + " = \"" + fields.attr[i] + "\"");
+                    }
+                    for (var i in fields.data) {
+                        eval("obj.data." + i + " = \"" + fields.data[i] + "\"");
+                    }
+                    for (var i in fields.functions) {
+                        eval("obj.functions['" + i + "'] = " + fields.functions[i] + " )");
+                    }
+                    for (var i in fields.calls) {
+                        var name = fields.calls[i].name;
+                        var detail = fields.calls[i].detail;
+                        if (obj.functions[i]) {
+                            for (var f in obj.functions[i]) {
+                                var func = eval(obj.functions[i][f]);
+                                func(detail);
+                            }
+                        }
+                    }
+                    room.forms[fields.id] = obj;
                 }
                 else {
-                    room.updates[fields.id] = fields;
+                    obj = room.updates[fields.id];
+                    if (obj) {
+                        for (var k in fields) {
+                            obj[k] = fields[k];
+                        }
+                        room.updates[fields.id] = obj;
+                    }
+                    else {
+                        room.updates[fields.id] = fields;
+                    }
                 }
-            }
+                room.forms[fields.id].key = key;
+                if (!room.forms[fields.id].keyTimeout) {
+                    room.forms[fields.id].keyTimeout = setTimeout(function resetKey() {
+                        delete room.forms[fields.id].key;
+                        delete room.forms[fields.id].keyTimeout;
+                    }, HTMLSync.params.updateLock);
+                }
+                resolve();
+            });
         });
     };
     HTMLSync.Room = require("./room");
     HTMLSync.Part = require("./part");
     HTMLSync.rooms = {};
-    HTMLSync.params = {};
+    HTMLSync.params = {
+        debug: false,
+        updateLock: 500
+    };
     HTMLSync.parts = {};
     return HTMLSync;
 }(EventEmitter));

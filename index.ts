@@ -27,12 +27,16 @@ class HTMLSync extends EventEmitter{
     static Room  = require("./room");
     static Part = require("./part");
     static rooms = {};
-    static params = {};
+    static params = {
+        debug:false,
+        updateLock: 500,
+    };
     static parts = {};
     static io;
     static socket;
 
     constructor(io:IO, params?){
+        super();
         if(!HTMLSync.instance) {
             HTMLSync.instance = this;
             HTMLSync.io = io;
@@ -41,7 +45,9 @@ class HTMLSync extends EventEmitter{
             HTMLSync.parts = {};
         }
         if(params) {
-            HTMLSync.params = params;
+            for(var key in params){
+                HTMLSync.params[key] = params[key];
+            }
         }else {
             HTMLSync.params = {};
         }
@@ -49,14 +55,17 @@ class HTMLSync extends EventEmitter{
     }
 
     static setSocket(socket:SocketIO){
+
         HTMLSync.socket = socket;
+
         socket.on('update', function(msg){
             HTMLSync.instance.emit("update", msg, socket);
             if(HTMLSync.params.debug){
                 console.log("update", msg);
             }
-            HTMLSync.updateForm(msg);
-            socket.broadcast.emit('update', msg);
+            HTMLSync.updateForm(msg, socket.id).then(function(){
+                socket.broadcast.emit('update', msg);
+            });
         });
 
         socket.on('add', function(msg){
@@ -152,53 +161,70 @@ class HTMLSync extends EventEmitter{
         }
     }
 
-    static updateForm(fields:UpdateData){
-        HTMLSync.getRoom(fields.roomId, function(room){
-            var obj = room.forms[fields.id];
-            if(obj){
-                for(var i in fields.style){
-                    eval("obj.style." + i + " = \"" + fields.style[i] + "\"");
-                }
-
-                for(var i in fields.attributes){
-                    eval("obj.attributes." + i + " = \"" + fields.attributes[i] + "\"");
-                }
-
-                for(var i in fields.attr){
-                    eval("obj.attributes." + i + " = \"" + fields.attr[i] + "\"");
-                }
-
-                for(var i in fields.data){
-                    eval("obj.data." + i + " = \"" + fields.data[i] + "\"");
-                }
-
-                for(var i in fields.functions){
-                    eval("obj.functions['" + i + "'] = " + fields.functions[i] + " )");
-                }
-
-                for(var i in fields.calls){
-                    var name = fields.calls[i].name;
-                    var detail = fields.calls[i].detail;
-                    if(obj.functions[i]){
-                        for(var f in obj.functions[i]){
-                            var func = eval(obj.functions[i][f]);
-                            func(detail);
+    static updateForm(fields:UpdateData, key?:SocketIO){
+        return new Promise(function(resolve, reject){
+            HTMLSync.getRoom(fields.roomId, function(room){
+                var obj = room.forms[fields.id];
+                if(obj){
+                    if(key){
+                        if(obj.key && key != obj.key){
+                            reject();
+                            return;
                         }
                     }
-                }
-                room.forms[fields.id] = obj;
-            }else{
-                var obj = room.updates[fields.id]
-                if(obj){
-                    for(var k in fields){
-                        obj[k] = fields[k];
-                    }
-                    room.updates[fields.id] = obj;
-                }else{
-                    room.updates[fields.id] = fields;
-                }
 
-            }
+                    for(var i in fields.style){
+                        eval("obj.style." + i + " = \"" + fields.style[i] + "\"");
+                    }
+
+                    for(var i in fields.attributes){
+                        eval("obj.attributes." + i + " = \"" + fields.attributes[i] + "\"");
+                    }
+
+                    for(var i in fields.attr){
+                        eval("obj.attributes." + i + " = \"" + fields.attr[i] + "\"");
+                    }
+
+                    for(var i in fields.data){
+                        eval("obj.data." + i + " = \"" + fields.data[i] + "\"");
+                    }
+
+                    for(var i in fields.functions){
+                        eval("obj.functions['" + i + "'] = " + fields.functions[i] + " )");
+                    }
+
+                    for(var i in fields.calls){
+                        var name = fields.calls[i].name;
+                        var detail = fields.calls[i].detail;
+                        if(obj.functions[i]){
+                            for(var f in obj.functions[i]){
+                                var func = eval(obj.functions[i][f]);
+                                func(detail);
+                            }
+                        }
+                    }
+                    room.forms[fields.id] = obj;
+                }else{
+                    obj = room.updates[fields.id];
+                    if(obj){
+                        for(var k in fields){
+                            obj[k] = fields[k];
+                        }
+                        room.updates[fields.id] = obj;
+                    }else{
+                        room.updates[fields.id] = fields;
+                    }
+
+                }
+                room.forms[fields.id].key = key;
+                if(!room.forms[fields.id].keyTimeout){
+                    room.forms[fields.id].keyTimeout = setTimeout(function resetKey(){
+                        delete room.forms[fields.id].key;
+                        delete room.forms[fields.id].keyTimeout;
+                    }, HTMLSync.params.updateLock);
+                }
+                resolve();
+            });
         });
     }
 }
