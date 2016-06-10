@@ -14,6 +14,7 @@ interface SocketIO{
     join(room:string);
     roomId:string;
     emit(name:string, data:any);
+    broadcast(name:string, data:any);
 }
 
 interface IO{
@@ -55,7 +56,7 @@ class HTMLSync extends EventEmitter{
                 console.log("update", msg);
             }
             HTMLSync.updateForm(msg);
-            HTMLSync.io.sockets.in(msg.roomId).emit('update', msg);
+            socket.broadcast.emit('update', msg);
         });
 
         socket.on('add', function(msg){

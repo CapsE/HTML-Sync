@@ -105,6 +105,7 @@ class HTMLSync{
 
     update(obj:any) {
         obj.roomId = HTMLSync.room;
+        HTMLSync.parts[obj.id].update(obj, false);
         HTMLSync.socket.emit("update", obj);
     }
 

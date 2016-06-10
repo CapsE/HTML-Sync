@@ -81,6 +81,7 @@ var HTMLSync = (function () {
     }
     HTMLSync.prototype.update = function (obj) {
         obj.roomId = HTMLSync.room;
+        HTMLSync.parts[obj.id].update(obj, false);
         HTMLSync.socket.emit("update", obj);
     };
     HTMLSync.update = function (obj) {

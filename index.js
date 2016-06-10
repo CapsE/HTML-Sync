@@ -33,7 +33,7 @@ var HTMLSync = (function (_super) {
                 console.log("update", msg);
             }
             HTMLSync.updateForm(msg);
-            HTMLSync.io.sockets.in(msg.roomId).emit('update', msg);
+            socket.broadcast.emit('update', msg);
         });
         socket.on('add', function (msg) {
             HTMLSync.instance.emit("add", msg, socket);
