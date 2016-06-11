@@ -17,6 +17,7 @@ class Syncable{
     data: any = {};
     functions: any = {};
     handlers:any = {};
+    locked:any = false;
 
     constructor(json?:any){
         if(json){
@@ -31,7 +32,9 @@ class Syncable{
             this.functions = json.functions;
             this.handlers = json.handlers;
             this.data = json.data;
-
+            if(!this.data.locked){
+                this.data.locked = false;
+            }
         }else{
             var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
             this.id = randLetter + Syncable.counter.toString() +  Date.now();
@@ -74,6 +77,12 @@ class Syncable{
      * Finds the HTML-Element and applies all attributes, styles and functions again with the current state.
      */
     update(fields?:UpdateData, send?:boolean){
+        if(!fields.key){
+            fields.key = HTMLSync.socket.id;
+        }
+        if(this.locked && this.locked != fields.key){
+            return;
+        }
         if(typeof(send) === "undefined"){
             send = true;
         }
@@ -81,6 +90,7 @@ class Syncable{
             this.renderHTML();
         }else if(!send){
             var element = document.getElementById(this.id);
+            var $element = $("#" + this.id);
             if(!element){
                 return false;
             }
@@ -124,6 +134,25 @@ class Syncable{
                     }
                 }
             }
+            if(!this.locked && fields.locked){
+                this.locked = fields.locked;
+                if(fields.locked != HTMLSync.socket.id){
+                    $element.addClass("sync-locked");
+                    this.call("locked", fields.locked);
+                }
+            }
+
+            if(this.locked && fields.locked == false){
+                this.locked = false;
+                if(this.locked != HTMLSync.socket.id ){
+                    $element.removeClass("sync-locked");
+                    this.call("unlocked");
+                }
+
+            }
+        }
+        if(this.locked){
+            fields.key = HTMLSync.socket.id;
         }
         if(send){
             fields.id = this.id;
@@ -199,6 +228,24 @@ class Syncable{
             console.debug("Clearing interval" + this.intervals[i]);
             clearInterval(this.intervals[i]);
         }
+    }
+
+    lock(){
+        var fields = {
+            id: this.id,
+            roomId: HTMLSync.room,
+            locked: HTMLSync.socket.id,
+        };
+        HTMLSync.update(fields);
+    }
+
+    unlock(){
+        var fields = {
+            id: this.id,
+            roomId: HTMLSync.room,
+            locked: false,
+        };
+        HTMLSync.update(fields);
     }
 }
 
