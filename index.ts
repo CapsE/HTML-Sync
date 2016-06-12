@@ -43,6 +43,8 @@ class HTMLSync extends EventEmitter{
 
             HTMLSync.rooms = {};
             HTMLSync.parts = {};
+        }else{
+            return HTMLSync.instance;
         }
         if(params) {
             for(var key in params){
@@ -69,11 +71,10 @@ class HTMLSync extends EventEmitter{
         });
 
         socket.on('add', function(msg){
-            HTMLSync.instance.emit("add", msg, socket);
             if(HTMLSync.params.debug){
                 console.log("add", msg);
             }
-            HTMLSync.getRoom(msg.roomId, function(room){
+            HTMLSync.getRoom(msg.roomId, true).then(function(room){
                 room.forms[msg.id] = msg;
                 HTMLSync.io.sockets.in(msg.roomId).emit('add', msg);
             });
@@ -84,7 +85,7 @@ class HTMLSync extends EventEmitter{
             if(HTMLSync.params.debug){
                 console.log("delete", msg);
             }
-            HTMLSync.getRoom(msg.roomId, function(room){
+            HTMLSync.getRoom(msg.roomId).then(function(room){
                 delete room.forms[msg.id];
                 delete room.updates[msg.id];
             });
@@ -103,15 +104,16 @@ class HTMLSync extends EventEmitter{
             socket.join(roomId);
             socket.roomId = roomId;
 
-            var room = HTMLSync.getRoom(roomId);
-            var forms = Object.keys(room.forms);
-            for(var i = 0; i < forms.length; i++){
-                socket.emit("add", room.forms[forms[i]]);
-            }
-            var updates = Object.keys(room.updates);
-            for(var i = 0; i < updates.length; i++){
-                socket.emit("update", room.updates[updates[i]]);
-            }
+            HTMLSync.getRoom(roomId).then(function(room){
+                var forms = Object.keys(room.forms);
+                for(var i = 0; i < forms.length; i++){
+                    socket.emit("add", room.forms[forms[i]]);
+                }
+                var updates = Object.keys(room.updates);
+                for(var i = 0; i < updates.length; i++){
+                    socket.emit("update", room.updates[updates[i]]);
+                }
+            });
         });
     }
 
@@ -130,27 +132,40 @@ class HTMLSync extends EventEmitter{
         }
         HTMLSync.parts[part.id] = part;
 
-        var room = HTMLSync.getRoom(room);
-        room.add(part);
+        HTMLSync.getRoom(room).then(function(room){
+            room.add(part);
+        });
+
     }
 
-    static getRoom(roomId:string, callback?:(room) => any) {
-        var out;
-        var isCalled = false;
-        if(HTMLSync.rooms[roomId]) {
-            out = HTMLSync.rooms[roomId];
-        }else {
-            if(!HTMLSync.params.db) {
-                out = new HTMLSync.Room(roomId);
-                HTMLSync.rooms[roomId] = out;
+    static getRoom(roomId:string, create?:boolean) {
+        return new Promise(function(success, reject){
+            if(HTMLSync.rooms[roomId]) {
+                success(HTMLSync.rooms[roomId]);
+                return;
+            }else{
+                if(HTMLSync.params.db) {
+                   var cursor = HTMLSync.params.db.find({roomId:roomId});
+                   cursor.each(function(err, doc){
+                      if(err){
+                          reject(err);
+                          return;
+                      }else{
+                          success(doc);
+                          return;
+                      }
+                   });
+                }
             }
-        }
+            if(create){
+                var room = new HTMLSync.Room(roomId);
+                HTMLSync.rooms[roomId] = room;
+                success(room);
+            }else{
+                reject(Error("Room not found"));
+            }
 
-        if(!isCalled && callback) {
-            callback(out);
-        }else {
-            return out;
-        }
+        });
     }
 
     static roomExists(roomId:string){
@@ -163,7 +178,7 @@ class HTMLSync extends EventEmitter{
 
     static updateForm(fields:UpdateData, key?:SocketIO){
         return new Promise(function(resolve, reject){
-            HTMLSync.getRoom(fields.roomId, function(room){
+            HTMLSync.getRoom(fields.roomId).then(function(room){
                 var obj = room.forms[fields.id];
                 if(obj){
                     if(key){
