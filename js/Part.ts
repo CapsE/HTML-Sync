@@ -12,7 +12,7 @@ interface UpdateData {
 }
 
 /**
- * Base Class for the synchronized working. Represents more or less a HTML-Tag.
+ *  Represents more or less a HTML-Tag and can be synchronized.
  */
 class Part extends Syncable{
 
@@ -74,6 +74,9 @@ class Part extends Syncable{
         this.content.push(obj);
     }
 
+    /**
+     * Alias for setStyle and setStyles
+     */
     css(attribute:string, value?:string){
         if(value){
             this.setStyle(attribute, value);
@@ -82,16 +85,25 @@ class Part extends Syncable{
         }
     }
 
+    /**
+     * Sets the style attribute to value
+     */
     private setStyle(attribute: string, value: string){
         this.style[attribute] = value;
     }
 
+    /**
+     * Sets all styles for the given key/value pairs
+     */
     private setStyles(style: any){
         for(var key in style){
             this.style[key] = style[key];
         }
     }
 
+    /**
+     * Alias for setAttribute and setAttributes
+     */
     attr(attribute:string, value?:string){
         if(value){
             this.setAttribute(attribute, value);
@@ -100,20 +112,32 @@ class Part extends Syncable{
         }
     }
 
+    /**
+     * Sets the attribute attribute to value
+     */
     private setAttribute(attribute: string, value: string){
         this.attributes[attribute] = value;
     }
 
+    /**
+     * Sets all attributes for the given key/value pairs
+     */
     private setAttributes(attribute: any){
         for(var key in attribute){
             this.attributes[key] = attribute[key];
         }
     }
 
+    /**
+     * Will load the given script as soon as this part is added to the document
+     */
     addInclude(incl: string){
         Part.includes.push(incl);
     }
 
+    /**
+     * Is called once an include is loaded. Fires ready event once all includes are loaded.
+     */
     includeLoaded(){
         Part.includesToLoad -= 1;
         if(Part.includesToLoad <= 0){
@@ -121,6 +145,7 @@ class Part extends Syncable{
             this.html().dispatchEvent(event);
         }
     }
+
     /**
      * Prepares a function. All occurences of "this" will be replaced with parts[this.id] which accesses the same Object
      * as this would but makes sure that the object will be found at runtime.
@@ -342,6 +367,9 @@ class Part extends Syncable{
         this.call("added", {});
     }
 
+    /**
+     * Changes the ID of this Part and updates child-parts accordingly
+     */
     changeId(id:string, mainId?:string){
         var updated = false;
         if(!mainId){

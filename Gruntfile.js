@@ -43,6 +43,17 @@ module.exports = function(grunt) {
                 ],
             },
         },
+        typedoc : {
+            build : {
+                src: ['./index.ts', './part.ts', './room.ts', './js/html-sync.ts', './js/part.ts', './js/syncable.ts'],
+                options: {
+                    out: './docs/',
+                    name: 'HTMLSync',
+                    module: 'commonjs',
+                    target: 'es5'
+                }
+            }
+        },
     });
 
     var path = process.argv[1];
@@ -50,6 +61,7 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-typedoc');
 
     grunt.registerTask('default', ['uglify']);
     grunt.registerTask('cp', ['uglify','copy:main:triangles','copy:main:helloWorld','copy:main:stars']);

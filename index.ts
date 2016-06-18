@@ -56,6 +56,9 @@ class HTMLSync extends EventEmitter{
         return this;
     }
 
+    /**
+     * Sets up the Events needed to sync Elements to the given Socket
+     */
     static setSocket(socket:SocketIO){
 
         HTMLSync.socket = socket;
@@ -117,11 +120,17 @@ class HTMLSync extends EventEmitter{
         });
     }
 
+    /**
+     * Applies the given updates. The target will be determined by msg.id
+     */
     static update(msg){
         HTMLSync.updateForm(msg);
         HTMLSync.io.sockets.in(msg.roomId).emit('update', msg);
     }
 
+    /**
+     * Sets up the Events needed to sync Elements to the given Socket
+     */
     static add(part:Part){
         var room;
         if(part.room){
@@ -138,6 +147,9 @@ class HTMLSync extends EventEmitter{
 
     }
 
+    /**
+     * Asynchronously loads a Room from either RAM or Database. Returns a promise.
+     */
     static getRoom(roomId:string, create?:boolean) {
         return new Promise(function(success, reject){
             if(HTMLSync.rooms[roomId]) {
@@ -168,6 +180,9 @@ class HTMLSync extends EventEmitter{
         });
     }
 
+    /**
+     * Checks if the given room exists
+     */
     static roomExists(roomId:string){
         if(HTMLSync.rooms[roomId]) {
             return true;
@@ -176,6 +191,9 @@ class HTMLSync extends EventEmitter{
         }
     }
 
+    /**
+     * Internal update function
+     */
     static updateForm(fields:UpdateData, key?:SocketIO){
         return new Promise(function(resolve, reject){
             HTMLSync.getRoom(fields.roomId).then(function(room){

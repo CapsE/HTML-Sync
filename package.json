@@ -31,5 +31,11 @@
   "gitHead": "24eeed9daa6dbbd9a7118a6cb9aadd6bb2d9b29e",
   "_id": "html-sync@1.0.8",
   "_shasum": "d59a3edc96ef46f44ca324be9ed380d0ce8ceb70",
-  "_from": "html-sync@1.0.8"
+  "_from": "html-sync@1.0.8",
+  "devDependencies": {
+    "grunt-jsdoc": "^2.1.0",
+    "grunt-typedoc": "^0.2.4",
+    "jsdoc": "^3.4.0",
+    "typedoc": "^0.4.3"
+  }
 }

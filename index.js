@@ -31,6 +31,9 @@ var HTMLSync = (function (_super) {
         }
         return this;
     }
+    /**
+     * Sets up the Events needed to sync Elements to the given Socket
+     */
     HTMLSync.setSocket = function (socket) {
         HTMLSync.socket = socket;
         socket.on('update', function (msg) {
@@ -85,10 +88,16 @@ var HTMLSync = (function (_super) {
             });
         });
     };
+    /**
+     * Applies the given updates. The target will be determined by msg.id
+     */
     HTMLSync.update = function (msg) {
         HTMLSync.updateForm(msg);
         HTMLSync.io.sockets.in(msg.roomId).emit('update', msg);
     };
+    /**
+     * Sets up the Events needed to sync Elements to the given Socket
+     */
     HTMLSync.add = function (part) {
         var room;
         if (part.room) {
@@ -103,6 +112,9 @@ var HTMLSync = (function (_super) {
             room.add(part);
         });
     };
+    /**
+     * Asynchronously loads a Room from either RAM or Database. Returns a promise.
+     */
     HTMLSync.getRoom = function (roomId, create) {
         return new Promise(function (success, reject) {
             if (HTMLSync.rooms[roomId]) {
@@ -134,6 +146,9 @@ var HTMLSync = (function (_super) {
             }
         });
     };
+    /**
+     * Checks if the given room exists
+     */
     HTMLSync.roomExists = function (roomId) {
         if (HTMLSync.rooms[roomId]) {
             return true;
@@ -142,6 +157,9 @@ var HTMLSync = (function (_super) {
             return false;
         }
     };
+    /**
+     * Internal update function
+     */
     HTMLSync.updateForm = function (fields, key) {
         return new Promise(function (resolve, reject) {
             HTMLSync.getRoom(fields.roomId).then(function (room) {

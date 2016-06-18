@@ -5,6 +5,9 @@
 declare var require;
 declare var module;
 
+/**
+ * Stores Parts and Syncables for a specific group of clients
+ */
 class Room{
 
     updates:any;
@@ -19,10 +22,16 @@ class Room{
         this.data = {};
     }
 
+    /**
+     * Adds a new Part to the Room
+     */
     add(part:Part){
         this.forms[part.id] = part.toJSON();
     }
 
+    /**
+     * Returns a JSON-Object of this room to be stored in a database
+     */
     toJSON(){
         return {
             updates: this.updates,
@@ -32,6 +41,9 @@ class Room{
         }
     }
 
+    /**
+     * Checks if this room contains any Parts or Syncables
+     */
     hasParts(){
         if(Object.keys(this.forms).length == 0){
             return false;

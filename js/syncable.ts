@@ -10,6 +10,15 @@ interface UpdateData {
     calls?:[any];
 }
 
+function debug(msg){
+    if(HTMLSync.params.debug){
+        console.log(msg);
+    }
+}
+
+/**
+ * Represents a verry basic Object that can be synchronised.
+ */
 class Syncable{
     id:string;
     name:string;
@@ -43,6 +52,9 @@ class Syncable{
 
     }
 
+    /**
+     * Changes the ID of this Part and updates child-parts accordingly
+     */
     changeId(id:string, mainId?:string){
         var updated = false;
         if(!mainId){
@@ -81,6 +93,7 @@ class Syncable{
             fields.key = HTMLSync.socket.id;
         }
         if(this.locked && this.locked != fields.key){
+            debug("This Part is locked");
             return;
         }
         if(typeof(send) === "undefined"){
@@ -88,7 +101,8 @@ class Syncable{
         }
         if(!fields){
             this.renderHTML();
-        }else if(!send){
+        }else{
+            debug("Applying Updates");
             var element = document.getElementById(this.id);
             var $element = $("#" + this.id);
             if(!element){
@@ -135,17 +149,21 @@ class Syncable{
                 }
             }
             if(!this.locked && fields.locked){
+                debug("Locking Part");
                 this.locked = fields.locked;
                 if(fields.locked != HTMLSync.socket.id){
                     $element.addClass("sync-locked");
+                    fields.attributes = $element.attr("class");
                     this.call("locked", fields.locked);
                 }
             }
 
             if(this.locked && fields.locked == false){
+                debug("Unlocking Part");
                 this.locked = false;
                 if(this.locked != HTMLSync.socket.id ){
                     $element.removeClass("sync-locked");
+                    fields.attributes = $element.attr("class");
                     this.call("unlocked");
                 }
 
@@ -154,7 +172,8 @@ class Syncable{
         if(this.locked){
             fields.key = HTMLSync.socket.id;
         }
-        if(send){
+        if(send != false){
+            debug("Sending Update");
             fields.id = this.id;
             fields.roomId = HTMLSync.room;
             fields.attributes = fields.attr;
@@ -183,10 +202,16 @@ class Syncable{
         return json;
     }
 
+    /**
+     * Alias for addEventHandler
+     */
     on(attribute: string, value: any){
         this.addEventHandler(attribute, value);
     }
 
+    /**
+     * Adds an Eventhandler to this Objekt
+     */
     addEventHandler(attribute: string, value: any){
         if(!this.functions[attribute]){
             this.functions[attribute] = [];
@@ -209,6 +234,9 @@ class Syncable{
         return f;
     }
 
+    /**
+     * Calls the given event with the given parameter can return results of this call.
+     */
     call(func, e){
         var result = [];
         var func = this.functions[func];
@@ -220,6 +248,9 @@ class Syncable{
         return result;
     }
 
+    /**
+     * Removes this Object, its children and all intervals that might still be running within it.
+     */
     kill(){
         for(var x = 0; x < this.content.length; x++){
             this.content[x].kill();
@@ -230,6 +261,9 @@ class Syncable{
         }
     }
 
+    /**
+     * Locks the Object so only the current Client may update it.
+     */
     lock(){
         var fields = {
             id: this.id,
@@ -239,6 +273,9 @@ class Syncable{
         HTMLSync.update(fields);
     }
 
+    /**
+     * Unlocks the Object so everybody may update it.
+     */
     unlock(){
         var fields = {
             id: this.id,
