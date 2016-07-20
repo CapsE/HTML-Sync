@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Html-sync : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Html-sync</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/CapsE/HTML-Sync">View on GitHub</a>
+
+          <h1 id="project_title">Html-sync</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/CapsE/HTML-Sync/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/CapsE/HTML-Sync/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h1>
+
+<h2>
+<a id="setting-everything-up" class="anchor" href="#setting-everything-up" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setting everything up</h2>
+
+<p>First install the library and save it to your package.json. After that install socket.io if you didn't already.</p>
+
+<pre><code>npm install html-sync --save
+
+npm install socket.io --save
+</code></pre>
+
+<p>In your main file add the following code to initialize the library</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> express <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>express<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> HTMLSync <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>html-sync<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// Set up the server</span>
+<span class="pl-k">var</span> app <span class="pl-k">=</span> <span class="pl-en">express</span>();
+<span class="pl-k">var</span> http <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>http<span class="pl-pds">'</span></span>).<span class="pl-en">createServer</span>(app);
+<span class="pl-smi">http</span>.<span class="pl-en">listen</span>(<span class="pl-c1">process</span>.<span class="pl-smi">env</span>.<span class="pl-c1">PORT</span> <span class="pl-k">||</span> <span class="pl-c1">3000</span>, <span class="pl-k">function</span>(){
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">"</span>listening on <span class="pl-pds">"</span></span> <span class="pl-k">+</span> (<span class="pl-c1">process</span>.<span class="pl-smi">env</span>.<span class="pl-c1">PORT</span> <span class="pl-k">||</span> <span class="pl-c1">3000</span>));
+});
+
+<span class="pl-c">// Start Socket.IO Server with instance of webserver</span>
+<span class="pl-k">var</span> io <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>socket.io<span class="pl-pds">'</span></span>)(http);
+
+<span class="pl-c">// Start HTML-Sync with instance of Socket.IO server</span>
+<span class="pl-k">var</span> hs <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">HTMLSync</span>(io, {debug<span class="pl-k">:</span><span class="pl-c1">true</span>});</pre></div>
+
+<p>That's it on the server side. Now we need to connect a client to the server and we are good to go.
+The following is a very basic HTML-Page that connects to the server.</p>
+
+<div class="highlight highlight-text-html-basic"><pre>    &lt;<span class="pl-ent">html</span>&gt;
+        &lt;<span class="pl-ent">head</span>&gt;
+<span class="pl-s1">            &lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>https://code.jquery.com/jquery-3.1.0.min.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</span>
+<span class="pl-s1">            &lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>html-sync.min.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</span>
+        &lt;/<span class="pl-ent">head</span>&gt;
+        &lt;<span class="pl-ent">body</span>&gt;
+            &lt;<span class="pl-ent">h1</span>&gt;Hello World&lt;/<span class="pl-ent">h1</span>&gt;
+            &lt;<span class="pl-ent">div</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>wrapper<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">div</span>&gt;
+        &lt;/<span class="pl-ent">body</span>&gt;
+<span class="pl-s1">        &lt;<span class="pl-ent">script</span>&gt;</span>
+<span class="pl-s1">            <span class="pl-k">var</span> htmlSync <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">HTMLSync</span>({</span>
+<span class="pl-s1">                debug<span class="pl-k">:</span><span class="pl-c1">true</span>,</span>
+<span class="pl-s1">                url<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ws://127.0.0.1:3000<span class="pl-pds">"</span></span>,</span>
+<span class="pl-s1">                room<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>/<span class="pl-pds">"</span></span></span>
+<span class="pl-s1">            });</span>
+<span class="pl-s1">        &lt;/<span class="pl-ent">script</span>&gt;</span>
+    &lt;/<span class="pl-ent">html</span>&gt;</pre></div>
+
+<p><strong>NOTE:</strong> Once you serve this code from your Express Server instead of the filesystem the url parameter is no longer neeeded.</p>
+
+<p>If everything worked out you should be able to start the server</p>
+
+<pre><code>$ node app.js
+listening on 3000
+</code></pre>
+
+<p>Once you open the HTML-file in a browser the server should print the following on the console.</p>
+
+<pre><code>a user connected
+join { room: '/' }
+</code></pre>
+
+<h2>
+<a id="creating-an-object" class="anchor" href="#creating-an-object" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Creating an object</h2>
+
+<p>Now that the connection is established we can start adding objects to be synched between multiple clients. You can add object either on the server or client side depending on your needs.
+Let's start by creating a simple user counter to our website. In your main server file add the following code</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// Actual user count as integer</span>
+<span class="pl-k">var</span> userCount <span class="pl-k">=</span> <span class="pl-c1">0</span>;
+
+<span class="pl-c">// The counter object that will be synced. In this case it's a &lt;h2&gt;-tag</span>
+<span class="pl-k">var</span> counter <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">HTMLSync.Part</span>(<span class="pl-s"><span class="pl-pds">"</span>h2<span class="pl-pds">"</span></span>);
+
+<span class="pl-c">// Setting up the default attributes of the element</span>
+<span class="pl-smi">counter</span>.<span class="pl-en">attr</span>({
+    innerHTML<span class="pl-k">:</span> userCount,
+    className<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>user-counter<span class="pl-pds">"</span></span>
+});
+
+<span class="pl-c">// This tells HTML-Sync where to add the object on the website</span>
+<span class="pl-smi">counter</span>.<span class="pl-c1">parent</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>wrapper<span class="pl-pds">"</span></span>;
+
+<span class="pl-c">// Finally add the object to all clients</span>
+<span class="pl-smi">HTMLSync</span>.<span class="pl-c1">add</span>(counter);</pre></div>
+
+<p>If you restart the server and refresh the website you should see a "0" under the "Hello World". To get the actual user count we need to add a bit more code to our server.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">io</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">"</span>connection<span class="pl-pds">"</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">socket</span>){
+    userCount <span class="pl-k">+=</span> <span class="pl-c1">1</span>;
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">"</span>A user connected. User count:<span class="pl-pds">"</span></span>, userCount);
+    <span class="pl-smi">counter</span>.<span class="pl-en">update</span>({
+        attr<span class="pl-k">:</span>{
+            innerHTML<span class="pl-k">:</span> <span class="pl-smi">userCount</span>.<span class="pl-c1">toString</span>()
+        }
+    });
+
+    <span class="pl-smi">socket</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">"</span>disconnect<span class="pl-pds">"</span></span>, <span class="pl-k">function</span>(){
+        userCount <span class="pl-k">-=</span> <span class="pl-c1">1</span>;
+        <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">"</span>A user disconnected. User count:<span class="pl-pds">"</span></span>, userCount);
+        <span class="pl-smi">counter</span>.<span class="pl-en">update</span>({
+            attr<span class="pl-k">:</span>{
+                innerHTML<span class="pl-k">:</span> <span class="pl-smi">userCount</span>.<span class="pl-c1">toString</span>()
+            }
+        });
+    });
+});</pre></div>
+
+<p>With this code we added an event handler for the usual Socket.IO connect- and disconnet-event. We adjust the userCounter variable and update the counter part object. If you open the test.html file multiple times every tab should always display the correct amount of connected clients.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Html-sync maintained by <a href="https://github.com/CapsE">CapsE</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
