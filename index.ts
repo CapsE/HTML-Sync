@@ -53,6 +53,11 @@ class HTMLSync extends EventEmitter{
         }else {
             HTMLSync.params = {};
         }
+        io.on('connection', function(socket){
+            console.log('a user connected');
+
+            HTMLSync.setSocket(socket);
+        });
         return this;
     }
 
@@ -141,7 +146,7 @@ class HTMLSync extends EventEmitter{
         }
         HTMLSync.parts[part.id] = part;
 
-        HTMLSync.getRoom(room).then(function(room){
+        HTMLSync.getRoom(room, true).then(function(room){
             room.add(part);
         });
 
