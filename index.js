@@ -37,6 +37,7 @@ var HTMLSync = function(io, params) {
 }
 util.inherits(HTMLSync, EventEmitter);
 HTMLSync.Room = require("./room")(HTMLSync);
+HTMLSync.Syncable = require("./syncable")(HTMLSync);
 HTMLSync.Part = require("./part")(HTMLSync);
 
 HTMLSync.setSocket = function (socket) {

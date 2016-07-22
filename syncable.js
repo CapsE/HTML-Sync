@@ -30,7 +30,7 @@ module.exports = function(HTMLSync){
             this.id = randLetter + Syncable.counter.toString() + Date.now();
             Syncable.counter++;
         }
-    }
+    };
     Syncable.prototype.changeId = function (id, mainId) {
         var updated = false;
         if (!mainId) {
